@@ -1,2 +1,7 @@
 streamlit
 pandas
+numpy
+numpy.linalg
+matplotlib
+matplotlib.pyplot
+matplotlib.ticker
