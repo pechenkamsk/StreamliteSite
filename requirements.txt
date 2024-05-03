@@ -5,3 +5,4 @@ numpy.linalg
 matplotlib
 matplotlib.pyplot
 matplotlib.ticker
+data
