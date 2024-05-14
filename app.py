@@ -306,7 +306,7 @@ def str_ind(otr, X, Y, G):
     return y1, x1, plt
 
 def vnut_iz(cou, delta_vip, mod = '1'):
-
+    
     y1 = []
     x1 = []
     for i in range(35):#[44*35 + 2]
@@ -314,12 +314,24 @@ def vnut_iz(cou, delta_vip, mod = '1'):
         x1.append(ind_agr[i])  
 
     sort(x1,y1)
-
-    fig, ax = plt.subplots(figsize=(15,15))
-    plt.rc('xtick', labelsize=15)
+    
+    if (mod != '%'):
+        plt.rc('xtick', labelsize=14)
+    else:
+        plt.rc('xtick', labelsize=20)
     plt.rc('ytick', labelsize=20)
+    fig, ax = plt.subplots(figsize=(15,15))
+    #if (mod != '%'):
+    #    plt.rc('xtick', labelsize=10)
+    #    #print("HERE 1")
+    #else:
+    #    plt.rc('xtick', labelsize=20)
+    #    #print("HERE 2")
+    
     
     def currency(x, pos):
+        if (x>1000 or x<1000):
+            return '{:1.0f} млрд. $'.format(x/1000)
     #'Два аргумента - это значение и позиция отметки.'
         return '{:1.0f} млн.$'.format(x)
     def currency2(x, pos):
@@ -331,8 +343,13 @@ def vnut_iz(cou, delta_vip, mod = '1'):
     ax.spines[['right', 'top', 'left','bottom']].set_visible(False) 
     #ax.xaxis.set_visible(False)
     if (mod != '%'):
-        ax.bar_label(bars, padding=4, color='black', 
-             fontsize=10, label_type='edge', fmt='%1.0f',
+        if (max(bars.datavalues) > 1000 or min(bars.datavalues)<1000) :
+            ax.bar_label(bars, padding=4, color='black', 
+             fontsize=10, label_type='edge', labels = ['{:.2f}'.format(x/1000) for x in bars.datavalues],
+            fontweight='bold')
+        else:
+            ax.bar_label(bars, padding=4, color='black', 
+             fontsize=10, label_type='edge', labels = ['{:f}'.format(x) for x in bars.datavalues],
             fontweight='bold')
     else:
         ax.bar_label(bars, padding=4, color='black', 
@@ -342,12 +359,15 @@ def vnut_iz(cou, delta_vip, mod = '1'):
     #plt.show()
     if (mod == '%'):
         formatter = FuncFormatter(currency2)
+        #plt.rc('xtick', labelsize=20)
     else:
         formatter = FuncFormatter(currency)
+        #plt.rc('xtick', labelsize=10)
     ax.xaxis.set_major_formatter(formatter)
-    ax.spines[['right', 'top', 'left', 'bottom']].set_visible(False) 
     
-    return y1, x1, plt
+    
+    
+    return y1, x1, plt 
 
 def find_benef(VIP_0, VIP_1, A):
     list_delta_vvp = []
@@ -488,12 +508,12 @@ list_G20 =[0, 1, 6, 14, 26, 25, 30, 7, 9, 21, 38, 50, 60, 57, 20, 33, 62, 31, 51
 list_BRICS_ = [6, 16, 26, 9, 50, 62]#6, 16, 26, 9, 50, 62 без Ирана , Эфиопии, ОАЭ
 
 
-def prognoz2(otr, delta, cou_to, year, scen, cou_zam = -1, val_zam = 0):
+def prognoz2(n_RUS, otr, delta, cou_to, year, scen, cou_zam = -1, val_zam = 0):
 
 #Задание переменных
     col = 14#перемененная агрегирования (по странам)
     
-    n_RUS = cou_agr.index('RUS') # номер России в списке
+    #n_RUS = cou_agr.index('RUS') # номер России в списке
 
     scen_otr = otr#пока по номеру
 
@@ -593,29 +613,58 @@ def prognoz2(otr, delta, cou_to, year, scen, cou_zam = -1, val_zam = 0):
     
     #Доделать на несколько регионов
         #3 - сценарий оставляем без изменений внут производство меняем только импорт
-
-    if (scen_n == 3):
-        sum_ost = 0
-        for i in range((77-col+1)*35):
-            if (i == n_RUS*35 + scen_otr or i == scen_cou_to*35 + scen_otr):
-                sum_ost = sum_ost
-            else:
-                sum_ost = sum_ost + G_new[i][scen_cou_to*35 + scen_otr]
-        
-        for i in range((77-col+1)):
-            if (i != n_RUS and i != scen_cou_to):
-                G_new[i*35 + scen_otr][scen_cou_to*35 + scen_otr] = G_new[i*35 + scen_otr][scen_cou_to*35 + scen_otr] - raz * G_new[i*35 + scen_otr][scen_cou_to*35 + scen_otr] / sum_ost
-    
-        res = findOut (A_scen, G_new, Y_scen)
-        
+    #'''
+    #if (scen_n  == 3):
+    #    sum_ost = 0
+    #    for i in range((77-col+1)*35):
+    #        if (i == n_RUS*35 + scen_otr or i == scen_cou_to*35 + scen_otr):
+    #            sum_ost = sum_ost
+    #        else:
+    #            sum_ost = sum_ost + G_new[i][scen_cou_to*35 + scen_otr]
+    #   
+    #    for i in range((77-col+1)):
+    #        if (i != n_RUS and i != scen_cou_to):
+    #            G_new[i*35 + scen_otr][scen_cou_to*35 + scen_otr] = G_new[i*35 + scen_otr][scen_cou_to*35 + scen_otr] - raz * G_new[i*35 + scen_otr][scen_cou_to*35 + scen_otr] / sum_ost
+    # 
+    #    res = findOut (A_scen, G_new, Y_scen)
+    #'''
     #4 - сценарий: Замещаем экспорт другой страны
     if (scen_n == 4):
-        G_new[cou_zam*35 + scen_otr][cou_to*35 + scen_otr] = G_new[cou_zam*35 + scen_otr][cou_to*35 + scen_otr] - raz
-    
+        if (scen_cou_to >= 0):
+            if (scen_cou_zam>=0):
+                G_new[cou_zam*35 + scen_otr][cou_to*35 + scen_otr] = G_new[cou_zam*35 + scen_otr][cou_to*35 + scen_otr] - raz
+            else:#в этом случае уменьшаем пропорционально их начальному значению
+                sum =  0 
+                for cou_zam_i in list_scen_cou_zam:
+                    sum = sum + G_new[cou_zam_i*35 + scen_otr][cou_to*35 + scen_otr]
+                
+                for cou_zam_i in list_scen_cou_zam:
+                    G_new[cou_zam_i*35 + scen_otr][cou_to*35 + scen_otr] = G_new[cou_zam_i*35 + scen_otr][cou_to*35 + scen_otr] - raz *  G_new[cou_zam_i*35 + scen_otr][cou_to*35 + scen_otr] / sum
+
+        else:
+            if (scen_cou_zam>=0):
+                k = 0
+                for cou_to_i in list_scen_cou_to:
+                    G_new[cou_zam*35 + scen_otr][cou_to_i*35 + scen_otr] = G_new[cou_zam*35 + scen_otr][cou_to_i*35 + scen_otr] - list_raz[k] 
+                    k = k + 1
+            else:
+                k = 0
+                sum = 0
+                for cou_to_i in list_scen_cou_to:
+
+                    for cou_zam_i in list_scen_cou_zam:
+                        sum = sum + G_new[cou_zam_i*35 + scen_otr][cou_to_i*35 + scen_otr]
+                
+                    for cou_zam_i in list_scen_cou_zam:
+                        G_new[cou_zam_i*35 + scen_otr][cou_to_i*35 + scen_otr] = G_new[cou_zam_i*35 + scen_otr][cou_to_i*35 + scen_otr] - list_raz[k] *  G_new[cou_zam_i*35 + scen_otr][cou_to_i*35 + scen_otr] / sum
+                    k = k + 1
+        
         res = findOut (A_scen, G_new, Y_scen)
         
-    #5 - сценарий: разворот из Европы на Восток (выбираем ресурс, выбираем изменение, выбираем где изменениея, выбираем сколько Россия смогла(в процентах) перенаправить из измения, выбираем куда перенаправила)
-    if (scen_n == 5):
+    #5 (+3)- сценарий: разворот из Европы на Восток (выбираем ресурс, выбираем изменение, выбираем где изменениея, выбираем сколько Россия смогла(в процентах) перенаправить из измения, выбираем куда перенаправила)
+    if (scen_n == 5 or scen_n == 3):
+        if (scen_n == 3):
+            val_zam = 0
         delta_exp_to_cou1 = 0
         zamech_exp = 0
         exp_to_cou2_nach = 0
@@ -904,13 +953,13 @@ def prognoz2(otr, delta, cou_to, year, scen, cou_zam = -1, val_zam = 0):
         
         file.write('\n')
         #2.4 - Изменения внутри Региона
-    file.write('#Абсолютные изменения выпусков России \n')
+    file.write('#Абсолютные изменения выпусков страны экспортёра '+cou_agr[n_RUS]+' \n')
     for i in range(len(x_delta_cou_from_abs)):
         file.write(str(i+1)+'. '+x_delta_cou_from_abs[-1-i]+': '+str(y_delta_cou_from_abs[-1-i]) +'\n')
     
     file.write('\n')
     
-    file.write('#Относительные изменения выпусков России \n')
+    file.write('#Относительные изменения выпусков страны экспортёра '+cou_agr[n_RUS]+'\n')
     for i in range(len(x_delta_cou_from_otn)):
         file.write(str(i+1)+'. '+x_delta_cou_from_otn[-1-i]+': '+str(y_delta_cou_from_otn[-1-i]) +'\n')
         
@@ -950,18 +999,88 @@ def prognoz2(otr, delta, cou_to, year, scen, cou_zam = -1, val_zam = 0):
     file.close()
     
     if(scen_n == 4):
-        return list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_exp_nach_zam, x_str_exp_nach_zam, fig_str_exp_nach_zam, y_str_exp_after_zam, x_str_exp_after_zam, fig_str_exp_after_zam, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_delta_cou_zam_abs, x_delta_cou_zam_abs,  fig_delta_cou_zam_abs, y_delta_cou_zam_otn, x_delta_cou_zam_otn,  fig_delta_cou_zam_otn, y_ben, x_ben,  fig_ben, y_top10, x_top10, fig_top10 
+        return cou_ex,list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_exp_nach_zam, x_str_exp_nach_zam, fig_str_exp_nach_zam, y_str_exp_after_zam, x_str_exp_after_zam, fig_str_exp_after_zam, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_delta_cou_zam_abs, x_delta_cou_zam_abs,  fig_delta_cou_zam_abs, y_delta_cou_zam_otn, x_delta_cou_zam_otn,  fig_delta_cou_zam_otn, y_ben, x_ben,  fig_ben, y_top10, x_top10, fig_top10 
 
     if(scen_n == 5):
-        return list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_exp_nach_zam, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_str_cou2_nach, x_str_cou2_nach, fig_str_cou2_nach, y_str_cou2_after,  x_str_cou2_after, fig_str_cou2_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_ben, x_ben,  fig_ben, y_top10, x_top10, fig_top10 
+        return cou_ex,list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_exp_nach_zam, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_str_cou2_nach, x_str_cou2_nach, fig_str_cou2_nach, y_str_cou2_after,  x_str_cou2_after, fig_str_cou2_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_ben, x_ben,  fig_ben, y_top10, x_top10, fig_top10 
     
-    return list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_ben, x_ben, fig_ben, y_top10, x_top10, fig_top10
+    return cou_ex,list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_ben, x_ben, fig_ben, y_top10, x_top10, fig_top10
 
 
 FLAG = 0
 
 
 # Add a selectbox to the sidebar:
+st.title("Приложение - калькулятор сдвигов в мировой торговле")
+
+cou_ex_name = st.selectbox(
+    'Выберете страну экспортёра:',
+    ('ARG',
+    'AUS',
+    'AUT',
+    'BEL',
+    'BGR',
+    'BLR',
+    'BRA',
+    'CAN',
+    'CHE',
+    'CHN',
+    'CIV',
+    'CMR',
+    'CYP',
+    'CZE',
+    'DEU',
+    'DNK',
+    'EGY',
+    'ESP',
+    'EST',
+    'FIN',
+    'FRA',
+    'GBR',
+    'GRC',
+    'HRV',
+    'HUN',
+    'IDN',
+    'IND',
+    'IRL',
+    'ISL',
+    'ISR',
+    'ITA',
+    'JPN',
+    'KAZ',
+    'KOR',
+    'LTU',
+    'LUX',
+    'LVA',
+    'MAR',
+    'MEX',
+    'MLT',
+    'MYS',
+    'NGA',
+    'NLD',
+    'NOR',
+    'NZL',
+    'PER',
+    'PHL',
+    'POL',
+    'PRT',
+    'ROU',
+    'RUS',
+    'SAU',
+    'SVK',
+    'SVN',
+    'SWE',
+    'THA',
+    'TUN',
+    'TUR',
+    'TWN',
+    'UKR',
+    'USA',
+    'VNM',
+    'ZAF',
+    'ROW'), (50)
+)
+
 otr_name = st.selectbox(
     'Выберете отрасль:',
     ('A01_02, Сельское хозяйство, охота, лесное хозяйство', 
@@ -1008,7 +1127,7 @@ otr_name = st.selectbox(
 #    0.0, 100.0, (25.0, 75.0)
 #)
 
-scen_val = st.slider("Изменение экспорта России в %:", -300, 300, (0))
+scen_val = st.slider("Изменение экспорта (страны экспортёра) в %:", -100, 1000, (0))
 
 cou_to_name = st.selectbox(
     'Выберете страну импортёра:',
@@ -1090,6 +1209,21 @@ scen_name = st.selectbox(
      'Изменение за счёт изменения экспорта конкретного (конкурирующего) региона',
      'Переориентации на альтернативный регион')
 )
+
+with st.expander("Подробнее о сценариях"):
+    st.subheader("Изменение за счёт внутреннего производства импортёра в данном регионе:")
+    st.write("Торговый коэффициент (коэффициенты) страны импортёра (стран импортёров), отвечающий(их) за внутренние поставки, изменятся на то значение, на которое меняется торговый коэффициент экспортёра.")
+
+    st.subheader("Изменение за счёт пропорционального изменения экспорта всего мира:")
+    st.write("Торговые коэффициенты всех экспортёров (помимо того, за счёт которого происходят все изменения), отвечающие за поставки в данную страну (страны) импортёр, изменяются пропорционально их начальным значениям так, чтоб сбалансировать изменение торгового коэффициента страны экспортёра.")
+
+    st.subheader("Изменение за счёт изменения экспорта конкретного (конкурирующего) региона:")
+    st.write("Торговый коэффициент (коэффициенты) страны конкурента (стран конкурентов), отвечающий(их) за поставки в страну (страны) импортёр, изменяются на то значение, на которое меняется торговый коэффициент экспортёра.")
+
+    st.subheader("Переориентации на альтернативный регион:")
+    st.write("Торговые коэффициенты всех экспортёров (помимо того, за счёт которого происходят все изменения), отвечающий(ие) за поставки в данную страну (страны) импортёр, изменяются пропорционально их начальным значениям так, чтоб сбалансировать изменение торгового коэффициента страны экспортёра.\n")
+    st.write("Вычисляется абсолютное изменение в торговле между страной экспортёром и страной (странами) импортёром, доля этого изменения (зависит от процента замещения альтернативным регионом) перекладывается на альтернативный регион.\n")
+    st.write("Торговые коэффициенты всех экспортёров (помимо того, за счёт которого происходят все изменения), отвечающий(ие) за поставки в альтернативную страну (страны), изменяются пропорционально их начальным значениям так, чтоб сбалансировать изменение торгового коэффициента страны экспортёра.")
 
 if (scen_name == 'Изменение за счёт изменения экспорта конкретного (конкурирующего) региона'):
     cou_zam_name = st.selectbox(
@@ -1374,6 +1508,7 @@ if flag_but:
 
 
 if FLAG > 0:
+    cou_ex = cou_slov[cou_ex_name]
     otr = otr_slov[otr_name]
     scen_v = scen_val
     cou_to = cou_slov[cou_to_name]
@@ -1386,19 +1521,20 @@ if FLAG > 0:
 
     #st.write(' otr: ', otr, ' scen_v: ', scen_v, ' cou_to: ', cou_to, ' scen_n: ', scen_n, ' scen_cou_zam: ', scen_cou_zam, ' zam_v: ', zam_v, ' scen_year: ', scen_year)
 
-    n_RUS = cou_agr.index('RUS')
+    n_RUS = cou_ex
+
 
     #применяем функции (разные возвраты при разных сценариях (вообще можно поубавить переменных, которые возвращаем))
     if scen_n == 4:
-        list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_exp_nach_zam, x_str_exp_nach_zam, fig_str_exp_nach_zam, y_str_exp_after_zam, x_str_exp_after_zam, fig_str_exp_after_zam, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_delta_cou_zam_abs, x_delta_cou_zam_abs,  fig_delta_cou_zam_abs, y_delta_cou_zam_otn, x_delta_cou_zam_otn,  fig_delta_cou_zam_otn, y_ben, x_ben,  fig_ben, y_top10, x_top10, fig_top10 = prognoz2(otr, scen_v, cou_to, scen_year, scen_n, scen_cou_zam, zam_v)
+        cou_ex, list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_exp_nach_zam, x_str_exp_nach_zam, fig_str_exp_nach_zam, y_str_exp_after_zam, x_str_exp_after_zam, fig_str_exp_after_zam, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_delta_cou_zam_abs, x_delta_cou_zam_abs,  fig_delta_cou_zam_abs, y_delta_cou_zam_otn, x_delta_cou_zam_otn,  fig_delta_cou_zam_otn, y_ben, x_ben,  fig_ben, y_top10, x_top10, fig_top10 = prognoz2(cou_ex, otr, scen_v, cou_to, scen_year, scen_n, scen_cou_zam, zam_v)
         
     elif (scen_n == 5):
-        list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_exp_nach_zam, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_str_cou2_nach, x_str_cou2_nach, fig_str_cou2_nach, y_str_cou2_after,  x_str_cou2_after, fig_str_cou2_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_ben, x_ben,  fig_ben, y_top10, x_top10, fig_top10 = prognoz2(otr, scen_v, cou_to, scen_year, scen_n, scen_cou_zam, zam_v)
+        cou_ex, list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_exp_nach_zam, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_str_cou2_nach, x_str_cou2_nach, fig_str_cou2_nach, y_str_cou2_after,  x_str_cou2_after, fig_str_cou2_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_ben, x_ben,  fig_ben, y_top10, x_top10, fig_top10 = prognoz2(cou_ex, otr, scen_v, cou_to, scen_year, scen_n, scen_cou_zam, zam_v)
         
     else:
-        list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_ben, x_ben, fig_ben, y_top10, x_top10, fig_top10 = prognoz2(otr, scen_v, cou_to, scen_year, scen_n, scen_cou_zam, zam_v)
+        cou_ex, list_scen_cou_to, list_scen_cou_zam, cou_zam, scen_cou_to, X_scen, Y_scen, A_scen, VIP_scen, res, G_nach, G_new, y_str_ind_nach, x_str_ind_nach, fig_str_ind_nach, y_str_ind_after, x_str_ind_after, fig_str_ind_after, y_str_exp_nach, x_str_exp_nach, fig_str_exp_nach, y_str_exp_after, x_str_exp_after, fig_str_exp_after, y_str_cou1_nach, x_str_cou1_nach, fig_str_cou1_nach, y_str_cou1_after, x_str_cou1_after, fig_str_cou1_after, y_delta_cou_from_abs, x_delta_cou_from_abs, fig_delta_cou_from_abs, y_delta_cou_from_otn, x_delta_cou_from_otn,  fig_delta_cou_from_otn, y_ben, x_ben, fig_ben, y_top10, x_top10, fig_top10 = prognoz2(cou_ex,otr, scen_v, cou_to, scen_year, scen_n, scen_cou_zam, zam_v)
 
-    
+    st.write("sum G_nach = ", np.sum(G_nach), "sum G_new = ", np.sum(G_new))
         
     #0.Метрики
         #0.1 Сравнение торг коэф и экспорта:
@@ -1469,15 +1605,19 @@ if FLAG > 0:
         vvp_C_I_1, list_vvp_C_I_1 = find_vvp(-1, res, A_scen, list_CHN_IND)
         vvp_C_I_0, list_vvp_C_I_0 = find_vvp(-1, VIP_scen, A_scen, list_CHN_IND)
 
-        col1, col2, col3 = st.columns(3)
+
+        #col1, col2, col3 = st.columns(3)
+        
+
+        #with col1:
+        st.metric('ВВП EU', value = '{:1.1f} млрд. $'.format(vvp_eu_1/1000), delta = '{:.2%} {:1.1f} млрд. $'.format(vvp_eu_1/vvp_eu_0 - 1,1, vvp_eu_1/1000 - vvp_eu_0/1000 ) )
+
+        col1, col2 = st.columns(2)     
 
         with col1:
-            st.metric('ВВП EU', value = '{:1.1f} млрд. $'.format(vvp_eu_1/1000), delta = '{:.2%} {:1.1f} млрд. $'.format(vvp_eu_1/vvp_eu_0 - 1,1, vvp_eu_1/1000 - vvp_eu_0/1000 ) )
-                      
-        with col2:
             st.metric('ВВП G7', value = '{:1.1f} млрд. $'.format(vvp_G7_1/1000), delta = '{:.2%} {:1.1f} млрд. $'.format(vvp_G7_1/vvp_G7_0 - 1,1, vvp_G7_1/1000 - vvp_G7_0/1000 ) )
 
-        with col3:
+        with col2:
             st.metric('ВВП G20', value = '{:1.1f} млрд. $'.format(vvp_G20_1/1000), delta = '{:.2%} {:1.1f} млрд. $'.format(vvp_G20_1/vvp_G20_0 - 1,1, vvp_G20_1/1000 - vvp_G20_0/1000 ) )
 
         col1, col2 = st.columns(2)
@@ -1629,6 +1769,8 @@ if FLAG > 0:
     fig_ben.title('Главные бенефициары по ВВП', fontsize = 30)
     #fig_ben.savefig('data/'+'couTo-'+cou_agr[scen_cou_to]+'_'+'otr-'+str(otr)+'_'+'scen-'+str(scen_n)+'_'+'delta-'+str(scen_v)+'_'+'year-'+str(scen_year)+'_benef.png')
     st.pyplot(fig_ben)
+
+    st.divider()
 
         #1.6 - Основные изменения в мировой торговле
         
