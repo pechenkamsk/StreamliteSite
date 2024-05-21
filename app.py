@@ -4,6 +4,7 @@ import pandas as pd
 from numpy.linalg import inv
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
+import streamlit.components.v1 as components
 
 g_colors = ['azure',
          'purple',
@@ -1141,8 +1142,19 @@ otr_name = st.selectbox(
 #    'Select a range of values',
 #    0.0, 100.0, (25.0, 75.0)
 #)
+col1, col2 = st.columns([4,1])
+u = 0
+v = 0
+with col1:
+    u = st.slider("Изменение экспорта (страны экспортёра) в %:", -100, 1000, (v))
+with col2:
+    #st.number_input(label, min_value=None, max_value=None, value="min", step=None, format=None, key=None, help=None, on_change=None, args=None, kwargs=None, *, placeholder=None, disabled=False, label_visibility="visible")
+    v = st.number_input(label = "", min_value=-100, max_value=10000, value = u)
+if (u != v):
+    u = v
+st.write("Изменение на " + str(v)+ "%")
+scen_val = v
 
-scen_val = st.slider("Изменение экспорта (страны экспортёра) в %:", -100, 1000, (0))
 
 cou_to_name = st.selectbox(
     'Выберете страну импортёра:',
@@ -1217,13 +1229,18 @@ cou_to_name = st.selectbox(
     'ROW')
 )
 
+
+
+
 scen_name = st.selectbox(
     'Сценарий:',
     ('Изменение за счёт внутреннего производства импортёра в данном регионе',
-     'Изменение за счёт пропорционального изменения экспорта всего мира',
-     'Изменение за счёт изменения экспорта конкретного (конкурирующего) региона',
-     'Переориентации на альтернативный регион')
+    'Изменение за счёт пропорционального изменения экспорта всего мира',
+    'Изменение за счёт изменения экспорта конкретного (конкурирующего) региона',
+    'Переориентации на альтернативный регион')
 )
+
+
 
 with st.expander("Подробнее о сценариях"):
     st.subheader("Изменение за счёт внутреннего производства импортёра в данном регионе:")
@@ -1408,8 +1425,18 @@ if (scen_name == 'Переориентации на альтернативный
     'ZAF',
     'ROW')
 )
-    
-    val_zam = st.slider("Процент замещения альтернативным регионом:", 0, 100, (75))
+
+    col1, col2 = st.columns([4,1])
+    u = 75
+    v = 75
+    with col1:
+        u = st.slider("Процент замещения альтернативным регионом:", 0, 100, (v))
+    with col2:
+        v = st.number_input("", 0, 100, u)
+
+    val_zam = v
+    st.write("Процент замещения: " + str(val_zam)+ "%")
+
 
 year = st.selectbox(
     'Расчётный год:', ('2019', '2020')
