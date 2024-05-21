@@ -592,7 +592,7 @@ def prognoz2(n_RUS, otr, delta, cou_to, year, scen, cou_zam = -1, val_zam = 0):
         else:
             l = 0
             for cou_i in list_scen_cou_to:
-                G_new[cou_i*35 + scen_otr][cou_i*35 + scen_otr] = G_new[cou_i*35 + scen_otr][scen_cou_to*35 + scen_otr] - list_raz[l]
+                G_new[cou_i*35 + scen_otr][cou_i*35 + scen_otr] = G_new[cou_i*35 + scen_otr][cou_i*35 + scen_otr] - list_raz[l]
                 l=l+1
         res = findOut (A_scen, G_new, Y_scen)
 
@@ -1149,7 +1149,7 @@ with col1:
     u = st.slider("Изменение экспорта (страны экспортёра) в %:", -100, 1000, (v))
 with col2:
     #st.number_input(label, min_value=None, max_value=None, value="min", step=None, format=None, key=None, help=None, on_change=None, args=None, kwargs=None, *, placeholder=None, disabled=False, label_visibility="visible")
-    v = st.number_input(label = "", min_value=-100, max_value=10000, value = u)
+    v = st.number_input(label = "Изменение экспорта (страны экспортёра) в %:", min_value=-100, max_value=10000, value = u, label_visibility="hidden")
 if (u != v):
     u = v
 st.write("Изменение на " + str(v)+ "%")
@@ -1432,7 +1432,7 @@ if (scen_name == 'Переориентации на альтернативный
     with col1:
         u = st.slider("Процент замещения альтернативным регионом:", 0, 100, (v))
     with col2:
-        v = st.number_input("", 0, 100, u)
+        v = st.number_input(label = "Процент замещения альтернативным регионом:", min_value=0, max_value=100, value = u, label_visibility="hidden")
 
     val_zam = v
     st.write("Процент замещения: " + str(val_zam)+ "%")
