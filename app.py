@@ -1142,14 +1142,14 @@ otr_name = st.selectbox(
 #    'Select a range of values',
 #    0.0, 100.0, (25.0, 75.0)
 #)
-col1, col2 = st.columns([4,1])
+col1, col2 = st.columns([2,1])
 u = 0
 v = 0
+#with col1:
+#    u = st.slider("Изменение экспорта (страны экспортёра) в %:", -100, 1000, (v))
 with col1:
-    u = st.slider("Изменение экспорта (страны экспортёра) в %:", -100, 1000, (v))
-with col2:
     #st.number_input(label, min_value=None, max_value=None, value="min", step=None, format=None, key=None, help=None, on_change=None, args=None, kwargs=None, *, placeholder=None, disabled=False, label_visibility="visible")
-    v = st.number_input(label = "Изменение экспорта (страны экспортёра) в %:", min_value=-100, max_value=10000, value = u, label_visibility="hidden")
+    v = st.number_input(label = "Изменение экспорта (страны экспортёра) в %:", min_value=-100, max_value=10000, value = u, label_visibility="visible")
 if (u != v):
     u = v
 st.write("Изменение на " + str(v)+ "%")
@@ -1426,13 +1426,13 @@ if (scen_name == 'Переориентации на альтернативный
     'ROW')
 )
 
-    col1, col2 = st.columns([4,1])
+    col1, col2 = st.columns([2,1])
     u = 75
     v = 75
+    #with col1:
+    #    u = st.slider("Процент замещения альтернативным регионом:", 0, 100, (v))
     with col1:
-        u = st.slider("Процент замещения альтернативным регионом:", 0, 100, (v))
-    with col2:
-        v = st.number_input(label = "Процент замещения альтернативным регионом:", min_value=0, max_value=100, value = u, label_visibility="hidden")
+        v = st.number_input(label = "Процент замещения альтернативным регионом:", min_value=0, max_value=100, value = u, label_visibility="visible")
 
     val_zam = v
     st.write("Процент замещения: " + str(val_zam)+ "%")
